@@ -8,32 +8,33 @@
 */
 
 import router from '@adonisjs/core/services/router'
+import { store as storeQuestion } from '#controllers/questions_controller'
 import { login, logout } from '#controllers/auth_controller'
-import { index as getConversations } from '#controllers/conversations_controller'
-import { show as getConversationsById } from '#controllers/conversations_controller'
-import { destroy as deleteConversation } from '#controllers/conversations_controller'
+import {
+  index as getConversations,
+  show as getConversationsById,
+  destroy as deleteConversation,
+} from '#controllers/conversations_controller'
 import { middleware } from './kernel.js'
 
-const QuestionsController = () => import('#controllers/questions_controller')
-
 router.get('/', async () => {
-  return {
-    hello: 'world',
-  }
+  return { message: 'Chatbot API online' }
 })
 
-router.post('/questions', [QuestionsController, 'store'])
-
-router.post('/login', login)
-
-router.post('/logout', logout).use(middleware.AuthSessionMiddleware())
-
-router.get('/conversation', getConversations).use(middleware.AuthSessionMiddleware())
+router.post('/questions', storeQuestion)
 
 router
-  .get('/conversation/:id_or_uuid', getConversationsById)
-  .use(middleware.AuthSessionMiddleware())
+  .group(() => {
+    router.post('/login', login)
+    router.post('/logout', logout).use(middleware.AuthSessionMiddleware())
+  })
+  .prefix('/auth')
 
 router
-  .delete('/conversation/:id_or_uuid', deleteConversation)
+  .group(() => {
+    router.get('/', getConversations)
+    router.get('/:id_or_uuid', getConversationsById)
+    router.delete('/:id_or_uuid', deleteConversation)
+  })
+  .prefix('/conversation')
   .use(middleware.AuthSessionMiddleware())
