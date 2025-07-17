@@ -1,16 +1,18 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Conversation from '#models/conversation'
-// import Message from '#models/message'
 
 export async function index({ request, response }: HttpContext) {
   try {
     const page = request.input('page', 1)
-    const show = request.input('show', 10)
+    const perPage = request.input('perPage', 10)
+    const sort = request.input('sort', 'desc')
 
-    const conversation = await Conversation
-      .query()
+    const sortDirection = sort === 'asc' ? 'asc' : 'desc'
+
+    const conversation = await Conversation.query()
+      .orderBy('created_at', sortDirection)
       .preload('messages')
-      .paginate(page, show)
+      .paginate(page, perPage)
 
     return response.ok(conversation)
   } catch (error) {
@@ -21,7 +23,7 @@ export async function index({ request, response }: HttpContext) {
 
 export async function show({ params, response }: HttpContext) {
   try {
-    const identifier = params.id_or_uuid
+    const identifier: string = params.id_or_uuid
 
     let conversationQuery = Conversation.query().preload('messages')
 
@@ -37,5 +39,26 @@ export async function show({ params, response }: HttpContext) {
   } catch (error) {
     console.error('error: ', error)
     return response.status(500).json({ error: 'Gagal mengambil covnersation' })
+  }
+}
+
+export async function destroy({ params, response }: HttpContext) {
+  try {
+    const identifier: string = params.id_or_uuid
+
+    const conversationData = await (Number.isInteger(+identifier)
+      ? Conversation.find(identifier)
+      : Conversation.query().where('session_id', identifier).first())
+
+    if (!conversationData) {
+      return response.notFound({ error: 'Conversation tidak ditemukan' })
+    }
+
+    await conversationData.delete()
+
+    return response.ok({ messages: 'Conversation berhasil dihapus' })
+  } catch (error) {
+    console.error('error: ', error)
+    return response.status(500).json({ error: 'Gagal menghapus conversation' })
   }
 }
