@@ -2,16 +2,14 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { v4 as uuidv4 } from 'uuid'
 import axios from 'axios'
 
+import { questionValidator } from '#validators/quetion'
 import Conversation from '#models/conversation'
 import Message from '#models/message'
 
 export default class QuestionsController {
   public async store({ request, response }: HttpContext) {
-    const question = request.input('question')
-
-    if (!question) {
-      return response.badRequest({ error: 'Pertanyaan tidak boleh kosong' })
-    }
+    const payload = await request.validateUsing(questionValidator)
+    const question = payload.question
 
     // Generate session_id UUID
     const sessionId = uuidv4()
