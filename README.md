@@ -83,7 +83,7 @@ API berjalan di `http://localhost:3333`
 
    Login dilakukan di route: 
    ```http
-   /auth/login
+   POST /auth/login
    ``` 
 
    Masukan `username` dan `password` di body dalam format `json` dengan validasi harus string dan tidak boleh kosong seperti berikut:
