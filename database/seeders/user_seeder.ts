@@ -5,6 +5,7 @@ import User from '#models/user'
 export default class UserSeeder extends BaseSeeder {
   async run() {
     await User.create({
+      // dummy user admin
       username: 'admin',
       password: await hash.make('bukanAdmin123'),
     })

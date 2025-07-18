@@ -4,8 +4,10 @@ import User from '#models/user'
 
 export default class AuthSessionMiddleware {
   async handle({ request, response }: HttpContext, next: NextFn) {
+    // Input token bearer di header authorization
     const header = request.header('Authorization')
 
+    // Jika token diisi dan ditemukan dalam database, maka akan lanjut ke proses berikutnya
     if (!header || !header.startsWith('Bearer ')) {
       return response.unauthorized({ error: 'Token tidak ditemukan' })
     }

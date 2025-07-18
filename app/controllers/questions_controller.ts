@@ -6,6 +6,7 @@ import Conversation from '#models/conversation'
 import Message from '#models/message'
 
 export async function store({ request, response }: HttpContext) {
+  // Mendapatkan data question serta validasi
   const payload = await request.validateUsing(questionValidator)
   const question = payload.question
 

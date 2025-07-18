@@ -21,8 +21,10 @@ router.get('/', async () => {
   return { message: 'Chatbot API online' }
 })
 
+// Route untuk mengirimkan question ke chatbot
 router.post('/questions', storeQuestion)
 
+// Route basic auth
 router
   .group(() => {
     router.post('/login', login)
@@ -30,6 +32,7 @@ router
   })
   .prefix('/auth')
 
+// route untuk menampilkan atau menghapus conversation, dibutuhkan auth
 router
   .group(() => {
     router.get('/', getConversations)
